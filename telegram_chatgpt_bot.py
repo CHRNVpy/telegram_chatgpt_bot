@@ -10,7 +10,7 @@ from aiogram.types import ParseMode
 openai.api_key = 'YOUR_OPENAI_TOKEN'
 
 # Create a bot instance and set up the dispatcher
-bot = Bot(token='YOUR_TELEGRAM_TOKEN')
+bot = Bot(token='YOUR_TELEGRAM_BOT_TOKEN')
 dp = Dispatcher(bot)
 
 
@@ -39,18 +39,18 @@ async def message_handler(message: types.Message):
         response_text = f'Сегодня {datetime.datetime.today().strftime("%A %d %B %Y")} года'
     else:
         # Use OpenAI API to generate a response to the user's message
-        response = openai.Completion.create(
-            engine='text-davinci-003',
-            prompt=message.text,
-            temperature=0.7,
-            max_tokens=500,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-        )
+        response = openai.ChatCompletion.create(
+              model="gpt-3.5-turbo",
+              messages=[
+                    #{"role": "system", "content": "You are a helpful assistant."},
+                    #{"role": "user", "content": "Who won the world series in 2020?"},
+                    {"role": "assistant", "content": message.text}
+                    #{"role": "user", "content": "Where was it played?"}
+                ]
+)
 
         # Extract the response text from the API response
-        response_text = response.choices[0].text.strip()
+        response_text = response.choices[0]['message']['content']
 
     # Send the response back to the user
     await message.reply(response_text, parse_mode=ParseMode.HTML)
